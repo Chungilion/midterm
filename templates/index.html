@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Visualization Dashboard</title>
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body class="loading">
+    <!-- Background Layers for Gradient and Particles -->
+    <div class="background-layer layer-1"></div>
+    <div class="background-layer layer-2"></div>
+    <div class="background-layer particles"></div>
+
+    <!-- Floating Shapes -->
+    <div class="floating-shape shape1"></div>
+    <div class="floating-shape shape2"></div>
+    <div class="floating-shape shape3"></div>
+
+    <!-- Main Content and Chart Container -->
+    <h1 class="glowing-title">Data Visualization Dashboard</h1>
+
+    <!-- Data Editing Form -->
+    <div class="chart-container">
+        <form action="{{ url_for('edit') }}" method="post" id="dataForm">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>University</th>
+                        <th>Location</th>
+                        <th>AI Rank Latin America</th>
+                        <th>AI Rank World</th>
+                        <th>Founded Year</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in data %}
+                    <tr>
+                        <td><input type="text" name="University" value="{{ row['University'] }}"></td>
+                        <td><input type="text" name="Location" value="{{ row['Location'] }}"></td>
+                        <td><input type="number" name="AI Rank Latin America" value="{{ row['AI Rank Latin America'] }}"></td>
+                        <td><input type="number" name="AI Rank World" value="{{ row['AI Rank World'] }}"></td>
+                        <td><input type="number" name="Founded Year" value="{{ row['Founded Year'] }}"></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button type="submit">Save Changes</button>
+        </form>
+    </div>
+
+    <!-- Chart Display Section -->
+    <div class="chart-container">
+        <!-- Each chart image is loaded dynamically by script.js -->
+        <img src="static/graph_gen/charts/lineplot.png" alt="Line Plot">
+        <img src="static/graph_gen/charts/scatter.png" alt="Scatter Plot">
+        <img src="static/graph_gen/charts/histogram.png" alt="Histogram">
+        <img src="static/graph_gen/charts/density_contour.png" alt="Density Contour">
+        <img src="static/graph_gen/charts/geograph.png" alt="Geographic Distribution">
+        <img src="static/graph_gen/charts/text_annotation.png" alt="Text Annotation">
+        <img src="static/graph_gen/charts/three_dimensional.png" alt="3D Visualization">
+        <img src="static/graph_gen/charts/visual_error.png" alt="Visual Error">
+    </div>
+
+    <script src="static/js/script.js"></script>
+</body>
+</html>
