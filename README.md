@@ -5,7 +5,7 @@
 path in "static/graph_gen/main.py" to your local path
 
 **RUNNING**
-- Make sure to have all the library installed
+- Make sure to have all the libraries installed
 - Run "python app.py" to start the local server, the project is running on Flask
 ---------------------------------------------------------------------------------------------------------
 - You can change the data directly from the main page and it will save to the csv file and run
