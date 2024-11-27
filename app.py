@@ -29,7 +29,7 @@ def regenerate_all_charts():
         './static/graph_gen/scatter_plot.py',
         './static/graph_gen/histogram.py',
         './static/graph_gen/density_contour.py',
-        './static/graph_gen/geograph.py',
+        #'./static/graph_gen/geograph.py',
         './static/graph_gen/text_anno.py',
         './static/graph_gen/three_dim.py',
         './static/graph_gen/visual_error.py'
