@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify
 import pandas as pd
 import subprocess
 import logging
+from concurrent.futures import ThreadPoolExecutor
 
 app = Flask(__name__)
 
@@ -28,39 +29,40 @@ def regenerate_all_charts():
         './static/graph_gen/three_dim.py',
         './static/graph_gen/visual_error.py'
     ]
+    
+    # Create a ThreadPoolExecutor to run the charts in parallel
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        future_to_chart = {executor.submit(run_chart, chart): chart for chart in charts}
 
-    for chart in charts:
-        try:
-            logging.info(f"Starting chart generation: {chart}")
-            # Run each chart generation script with a timeout of 60 seconds
-            result = subprocess.run(
-                ['python', chart],
-                check=True, 
-                capture_output=True, 
-                text=True, 
-                timeout=60  # Timeout for 60 seconds
-            )
-            
-            # Log stdout and stderr to capture more details
-            logging.info(f"Stdout for {chart}: {result.stdout}")
-            logging.error(f"Stderr for {chart}: {result.stderr}")
+        # Log status of each chart
+        for future in future_to_chart:
+            chart = future_to_chart[future]
+            try:
+                future.result()  # Wait for chart to complete
+                logging.info(f"Successfully generated chart: {chart}")
+            except Exception as e:
+                logging.error(f"Error generating chart {chart}: {e}")
 
-            logging.info(f"Successfully generated chart: {chart}")
-        
-        except subprocess.CalledProcessError as e:
-            # If chart generation fails, log the error and skip the chart
-            logging.error(f"Error generating chart {chart}: {e}")
-            continue  # Skip this chart and proceed with the next one
-        
-        except subprocess.TimeoutExpired as e:
-            # If subprocess times out, log and skip the chart
-            logging.error(f"Timeout expired while generating chart {chart}: {e}")
-            continue  # Skip this chart and proceed with the next one
-        
-        except Exception as e:
-            # Log any unexpected errors
-            logging.error(f"Unexpected error in chart generation {chart}: {e}")
-            raise e  # Reraise the error if it's unexpected
+def run_chart(chart):
+    """Helper function to run chart generation scripts."""
+    try:
+        logging.info(f"Starting chart generation: {chart}")
+        result = subprocess.run(
+            ['python', chart],
+            check=True, 
+            capture_output=True, 
+            text=True, 
+            timeout=120  # Timeout for 120 seconds
+        )
+
+        logging.info(f"Stdout for {chart}: {result.stdout}")
+        logging.error(f"Stderr for {chart}: {result.stderr}")
+    except subprocess.CalledProcessError as e:
+        logging.error(f"Error generating chart {chart}: {e}")
+    except subprocess.TimeoutExpired as e:
+        logging.error(f"Timeout expired while generating chart {chart}: {e}")
+    except Exception as e:
+        logging.error(f"Unexpected error in chart generation {chart}: {e}")
 
 @app.route('/')
 def index():
@@ -75,7 +77,7 @@ def edit():
         df = pd.DataFrame(updated_data)
         save_data(df)
 
-        # Regenerate all charts after saving data
+        # Regenerate all charts asynchronously after saving data
         regenerate_all_charts()
 
         return jsonify({"status": "success", "message": "Data updated successfully"})
