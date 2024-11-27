@@ -22,8 +22,8 @@ def regenerate_all_charts():
         './static/graph_gen/line_plot.py',
         './static/graph_gen/scatter_plot.py',
         './static/graph_gen/histogram.py',
-        './static/graph_gen/density_contour.py',  # Check this chart specifically
-        # Skipping geograph.py (geospatial chart)
+        './static/graph_gen/density_contour.py',  # Focus on contour plot
+        # Skipping geograph.py (geospatial chart) for now
         './static/graph_gen/text_anno.py',
         './static/graph_gen/three_dim.py',
         './static/graph_gen/visual_error.py'
@@ -31,14 +31,14 @@ def regenerate_all_charts():
 
     for chart in charts:
         try:
-            logging.info(f"Running chart generation: {chart}")
+            logging.info(f"Starting chart generation: {chart}")
             # Run each chart generation script with a timeout of 60 seconds
             result = subprocess.run(
                 ['python', chart],
                 check=True, 
                 capture_output=True, 
                 text=True, 
-                timeout=60  # Set a timeout (in seconds)
+                timeout=60  # Timeout for 60 seconds
             )
             
             # Log stdout and stderr to capture more details
@@ -46,14 +46,17 @@ def regenerate_all_charts():
             logging.error(f"Stderr for {chart}: {result.stderr}")
 
             logging.info(f"Successfully generated chart: {chart}")
+        
         except subprocess.CalledProcessError as e:
             # If chart generation fails, log the error and skip the chart
             logging.error(f"Error generating chart {chart}: {e}")
             continue  # Skip this chart and proceed with the next one
+        
         except subprocess.TimeoutExpired as e:
             # If subprocess times out, log and skip the chart
             logging.error(f"Timeout expired while generating chart {chart}: {e}")
             continue  # Skip this chart and proceed with the next one
+        
         except Exception as e:
             # Log any unexpected errors
             logging.error(f"Unexpected error in chart generation {chart}: {e}")
