@@ -1,17 +1,24 @@
-# 1. Start with a base image that has Python installed
+# Use an official Python runtime as a parent image
 FROM python:3.9-slim
 
-# 2. Set the working directory inside the container
+# Set the working directory in the container
 WORKDIR /app
 
-# 3. Copy the current directory contents (including app.py) into the container
+# Copy the current directory contents into the container at /app
 COPY . /app
 
-# 4. Install dependencies listed in requirements.txt
+# Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 5. Expose the port your Flask app will run on
+# Expose the port the app runs on
 EXPOSE 5000
 
-# 6. Command to run the Flask app (replace app.py with your actual app file)
-CMD ["python", "app.py"]
+# Define environment variable to ensure Flask runs in development mode
+ENV FLASK_APP=app.py
+ENV FLASK_RUN_HOST=0.0.0.0 
+ENV FLASK_RUN_PORT=5000   
+
+# Run Flask app
+CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
+
+#ssh -R 80:localhost:5000 serveo.net
